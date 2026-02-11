@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const User = require("../models/user");
 const Transaction = require("../models/Transaction");
 
 // 1️⃣ Get All Accounts
