@@ -1,29 +1,21 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://bank-backend-7uqn.onrender.com",
+  baseURL: "http://localhost:5000",
 });
 
-// Attach JWT automatically (User OR Manager)
-API.interceptors.request.use(
-  (config) => {
+// Attach token automatically
+API.interceptors.request.use((config) => {
+  const user = JSON.parse(localStorage.getItem("user"));
+  const managerToken = localStorage.getItem("managerToken");
 
-    // Try user token first
-    const userData = JSON.parse(localStorage.getItem("user"));
-    const userToken = userData?.token;
+  if (user?.token) {
+    config.headers.Authorization = `Bearer ${user.token}`;
+  } else if (managerToken) {
+    config.headers.Authorization = `Bearer ${managerToken}`;
+  }
 
-    // Then try manager token
-    const managerToken = localStorage.getItem("managerToken");
-
-    const token = userToken || managerToken;
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+  return config;
+});
 
 export default API;
