@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
 
 function ManagerPanel() {
@@ -7,16 +8,32 @@ function ManagerPanel() {
   const [searchAcc, setSearchAcc] = useState("");
   const [accountDetails, setAccountDetails] = useState(null);
 
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("managerToken");
+    localStorage.removeItem("managerName");
+    navigate("/manager-login");
+  };
+
   // Load All Accounts
   const loadAccounts = async () => {
-    const res = await API.get("/manager/accounts");
-    setAccounts(res.data);
+    try {
+      const res = await API.get("/manager/accounts");
+      setAccounts(res.data);
+    } catch (error) {
+      console.error("Error loading accounts:", error);
+    }
   };
 
   // Load Specific Account
   const loadAccountDetails = async () => {
-    const res = await API.get(`/manager/account/${searchAcc}`);
-    setAccountDetails(res.data);
+    try {
+      const res = await API.get(`/manager/account/${searchAcc}`);
+      setAccountDetails(res.data);
+    } catch (error) {
+      alert("Account not found");
+    }
   };
 
   useEffect(() => {
@@ -27,8 +44,33 @@ function ManagerPanel() {
 
   return (
     <div style={{ padding: "40px" }}>
-      <h2>Manager Panel</h2>
 
+      {/* Header with Logout */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "30px"
+      }}>
+        <h2>Manager Panel</h2>
+
+        <button
+          onClick={handleLogout}
+          style={{
+            padding: "8px 14px",
+            backgroundColor: "#ef4444",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
+        >
+          Logout
+        </button>
+      </div>
+
+      {/* Navigation Buttons */}
       <div style={{ marginBottom: "20px" }}>
         <button onClick={() => setSection("dashboard")}>Dashboard</button>
         <button onClick={() => setSection("accounts")}>See Accounts</button>
@@ -36,14 +78,14 @@ function ManagerPanel() {
         <button onClick={() => setSection("requests")}>Requests</button>
       </div>
 
-      {/* 1️⃣ Dashboard */}
+      {/* Dashboard */}
       {section === "dashboard" && (
         <div>
           <h3>Welcome, Bank Manager 👔</h3>
         </div>
       )}
 
-      {/* 2️⃣ See Accounts */}
+      {/* See Accounts */}
       {section === "accounts" && (
         <div>
           <h3>All Accounts</h3>
@@ -71,7 +113,7 @@ function ManagerPanel() {
         </div>
       )}
 
-      {/* 3️⃣ Manage Account */}
+      {/* Manage Account */}
       {section === "manage" && (
         <div>
           <h3>Manage Account</h3>
@@ -81,6 +123,7 @@ function ManagerPanel() {
             value={searchAcc}
             onChange={(e) => setSearchAcc(e.target.value)}
           />
+
           <button onClick={loadAccountDetails}>Search</button>
 
           {accountDetails && (
@@ -114,13 +157,14 @@ function ManagerPanel() {
         </div>
       )}
 
-      {/* 4️⃣ Requests */}
+      {/* Requests */}
       {section === "requests" && (
         <div>
           <h3>Requests Section</h3>
           <p>Coming Soon...</p>
         </div>
       )}
+
     </div>
   );
 }
