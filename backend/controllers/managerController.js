@@ -1,6 +1,6 @@
 const DepositRequest = require("../models/DepositRequest");
 const Transaction = require("../models/Transaction");
-const User = require("../models/User");
+const User = require("../models/user");
 
 // Get All Pending Requests
 exports.getDepositRequests = async (req, res) => {
