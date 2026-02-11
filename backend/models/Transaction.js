@@ -24,6 +24,10 @@ const transactionSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    
+    balanceAfter: {
+    type: Number,
+    },
 
     description: {
       type: String,
