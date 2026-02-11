@@ -23,7 +23,7 @@ const app = express();
 app.use(cors());
 
 
-app.use("/api/manager", managerRoutes);
+app.use("/manager", managerRoutes);
 
 // Parse JSON bodies
 app.use(express.json());
@@ -35,7 +35,7 @@ app.use(express.json());
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/account", require("./routes/accountRoutes"));
 app.use("/transactions", require("./routes/transactionRoutes"));
-app.use("/api/manager-auth", managerAuthRoutes);
+app.use("/manager-auth", managerAuthRoutes);
 // Root route
 app.get("/", (req, res) => {
   res.send("🏦 MERN Banking API is running...");
