@@ -4,39 +4,27 @@ const transactionSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: true,
     },
-
     type: {
       type: String,
-      enum: ["deposit", "withdraw", "transfer"],
       required: true,
     },
-
     amount: {
       type: Number,
       required: true,
     },
-
     receiver: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
+      ref: "user",
     },
-    
-    balanceAfter: {
-    type: Number,
-    },
-
-    description: {
-      type: String,
-      default: "",
-    },
+    description: String,
+    balanceAfter: Number,
   },
-  {
-    timestamps: true, // Automatically adds createdAt & updatedAt
-  }
+  { timestamps: true }
 );
 
-module.exports = mongoose.model("Transaction", transactionSchema);
+module.exports =
+  mongoose.models.Transaction ||
+  mongoose.model("Transaction", transactionSchema);
