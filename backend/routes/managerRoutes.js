@@ -1,3 +1,5 @@
+console.log("Manager Controller Loaded");
+
 const express = require("express");
 const router = express.Router();
 
@@ -10,3 +12,5 @@ router.post("/approve/:id", managerController.approveDeposit);
 router.post("/decline/:id", managerController.declineDeposit);
 
 module.exports = router;
+
+console.log(module.exports);
