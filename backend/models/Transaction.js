@@ -4,7 +4,7 @@ const transactionSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
       required: true,
     },
     type: {
@@ -17,14 +17,19 @@ const transactionSchema = new mongoose.Schema(
     },
     receiver: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
+      default: null,
     },
-    description: String,
-    balanceAfter: Number,
+    description: {
+      type: String,
+      default: "",
+    },
+    balanceAfter: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
 
-module.exports =
-  mongoose.models.Transaction ||
-  mongoose.model("Transaction", transactionSchema);
+module.exports = mongoose.model("Transaction", transactionSchema);
