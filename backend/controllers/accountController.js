@@ -3,16 +3,11 @@ const Transaction = require("../models/Transaction");
 const DepositRequest = require("../models/DepositRequest");
 
 
-// ==========================================
 // GET BALANCE
-// ==========================================
 exports.getBalance = async (req, res) => {
   try {
     const user = await User.findById(req.user);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json({
       accountNumber: user.accountNumber,
@@ -20,22 +15,19 @@ exports.getBalance = async (req, res) => {
       balance: user.balance,
     });
 
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
 
-// ==========================================
-// DEPOSIT (REQUEST BASED)
-// ==========================================
+// DEPOSIT (REQUEST)
 exports.deposit = async (req, res) => {
   try {
     const { amount } = req.body;
 
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ message: "Invalid deposit amount" });
-    }
+    if (!amount || amount <= 0)
+      return res.status(400).json({ message: "Invalid amount" });
 
     const user = await User.findById(req.user);
 
@@ -44,34 +36,31 @@ exports.deposit = async (req, res) => {
       accountNumber: user.accountNumber,
       name: user.name,
       amount: Number(amount),
+      status: "pending",
     });
 
     res.json({
-      message: "Deposit request sent. Please wait for manager approval.",
+      message: "Deposit request sent. Wait for manager approval.",
     });
 
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
 
-// ==========================================
 // WITHDRAW
-// ==========================================
 exports.withdraw = async (req, res) => {
   try {
     const { amount } = req.body;
 
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ message: "Invalid withdrawal amount" });
-    }
+    if (!amount || amount <= 0)
+      return res.status(400).json({ message: "Invalid amount" });
 
     const user = await User.findById(req.user);
 
-    if (user.balance < amount) {
+    if (user.balance < amount)
       return res.status(400).json({ message: "Insufficient balance" });
-    }
 
     user.balance -= Number(amount);
     await user.save();
@@ -84,51 +73,41 @@ exports.withdraw = async (req, res) => {
     });
 
     res.json({
-      message: "Withdrawal successful",
-      newBalance: user.balance,
+      message: "Withdraw successful",
+      balance: user.balance,
     });
 
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
 
-// ==========================================
 // TRANSFER
-// ==========================================
 exports.transfer = async (req, res) => {
   try {
     const { receiverAccountNumber, amount } = req.body;
 
-    if (!receiverAccountNumber || !amount || amount <= 0) {
+    if (!receiverAccountNumber || !amount || amount <= 0)
       return res.status(400).json({ message: "Invalid transfer details" });
-    }
 
     const sender = await User.findById(req.user);
-    const receiver = await User.findOne({ accountNumber: receiverAccountNumber });
+    const receiver = await User.findOne({
+      accountNumber: receiverAccountNumber,
+    });
 
-    if (!receiver) {
-      return res.status(404).json({ message: "Receiver account not found" });
-    }
+    if (!receiver)
+      return res.status(404).json({ message: "Receiver not found" });
 
-    if (sender.accountNumber === receiver.accountNumber) {
-      return res.status(400).json({ message: "Cannot transfer to same account" });
-    }
-
-    if (sender.balance < amount) {
+    if (sender.balance < amount)
       return res.status(400).json({ message: "Insufficient balance" });
-    }
 
-    // Deduct sender
     sender.balance -= Number(amount);
-    await sender.save();
-
-    // Credit receiver
     receiver.balance += Number(amount);
+
+    await sender.save();
     await receiver.save();
 
-    // Sender transaction
     await Transaction.create({
       user: sender._id,
       type: "transfer",
@@ -138,7 +117,6 @@ exports.transfer = async (req, res) => {
       balanceAfter: sender.balance,
     });
 
-    // Receiver transaction
     await Transaction.create({
       user: receiver._id,
       type: "transfer",
@@ -150,10 +128,10 @@ exports.transfer = async (req, res) => {
 
     res.json({
       message: "Transfer successful",
-      newBalance: sender.balance,
+      balance: sender.balance,
     });
 
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 };
