@@ -35,6 +35,11 @@ function Register() {
           placeholder="Email"
           onChange={(e) => setForm({ ...form, email: e.target.value })}
         />
+        <input
+          placeholder="Phone Number"
+          value={mobile}
+          onChange={(e) => setMobile(e.target.value)}
+          />
 
         <input
           type="password"
