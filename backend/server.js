@@ -35,7 +35,7 @@ app.use(express.json());
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/account", require("./routes/accountRoutes"));
 app.use("/transactions", require("./routes/transactionRoutes"));
-app.use("/manager-auth", managerAuthRoutes);
+app.use("/api/manager-auth", managerAuthRoutes);
 // Root route
 app.get("/", (req, res) => {
   res.send("🏦 MERN Banking API is running...");
