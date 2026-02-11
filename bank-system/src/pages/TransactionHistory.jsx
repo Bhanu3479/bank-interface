@@ -11,7 +11,7 @@ function TransactionHistory() {
         const res = await API.get("/transactions");
         setTransactions(res.data);
       } catch (error) {
-        console.log("Error fetching transactions");
+        console.error("Error fetching transactions");
       }
     };
 
@@ -19,37 +19,43 @@ function TransactionHistory() {
   }, []);
 
   return (
-    <div>
+    <>
       <Navbar />
-      <div className="table-container">
-        <h2>Mini Statement</h2>
+      <div className="operation-container">
+        <div className="operation-card" style={{ width: "900px" }}>
+          <h2>Mini Statement</h2>
 
-        <table border="1" width="100%" cellPadding="10">
-          <thead>
-            <tr>
-              <th>Account</th>
-              <th>Type</th>
-              <th>CR/DR</th>
-              <th>Amount</th>
-              <th>Date & Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((txn, index) => (
-              <tr key={index}>
-                <td>{txn.account}</td>
-                <td>{txn.type}</td>
-                <td>{txn.crdr}</td>
-                <td>₹ {txn.amount}</td>
-                <td>{new Date(txn.datetime).toLocaleString()}</td>
+          <table className="styled-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>CR/DR</th>
+                <th>Amount</th>
+                <th>Balance After</th>
+                <th>Date</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {transactions.length === 0 && <p>No transactions found</p>}
+            </thead>
+            <tbody>
+              {transactions.map((txn) => (
+                <tr key={txn._id}>
+                  <td>{txn.type}</td>
+                  <td>
+                    {txn.type === "withdraw" || txn.type === "transfer"
+                      ? "DR"
+                      : "CR"}
+                  </td>
+                  <td>₹ {txn.amount}</td>
+                  <td>₹ {txn.balanceAfter || 0}</td>
+                  <td>
+                    {new Date(txn.createdAt).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
