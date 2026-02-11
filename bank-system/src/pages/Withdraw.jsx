@@ -6,9 +6,17 @@ function Withdraw() {
   const [amount, setAmount] = useState("");
 
   const handleWithdraw = async () => {
+    if (!amount || amount <= 0) {
+      alert("Enter valid amount");
+      return;
+    }
+
     try {
-      await API.post("/account/withdraw", { amount });
-      alert("Withdrawal successful");
+      const res = await API.post("/account/withdraw", {
+        amount: Number(amount),
+      });
+
+      alert(res.data.message);
       setAmount("");
     } catch (error) {
       alert(error.response?.data?.message || "Withdrawal failed");
@@ -16,7 +24,7 @@ function Withdraw() {
   };
 
   return (
-    <div>
+    <>
       <Navbar />
       <div className="operation-container">
         <div className="operation-card">
@@ -29,10 +37,12 @@ function Withdraw() {
             onChange={(e) => setAmount(e.target.value)}
           />
 
-          <button>Withdraw</button>
+          <button onClick={handleWithdraw}>
+            Withdraw
+          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
