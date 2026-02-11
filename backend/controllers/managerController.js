@@ -3,32 +3,25 @@ const Transaction = require("../models/Transaction");
 const User = require("../models/user");
 
 
-// ==========================================
 // GET ALL ACCOUNTS
-// ==========================================
 exports.getAllAccounts = async (req, res) => {
   try {
     const users = await User.find().select(
       "accountNumber name email mobile balance"
     );
-
     res.json(users);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
 
-// ==========================================
 // GET ACCOUNT DETAILS
-// ==========================================
 exports.getAccountDetails = async (req, res) => {
   try {
     const { accountNumber } = req.params;
 
     const user = await User.findOne({ accountNumber });
-
     if (!user) {
       return res.status(404).json({ message: "Account not found" });
     }
@@ -36,52 +29,36 @@ exports.getAccountDetails = async (req, res) => {
     const transactions = await Transaction.find({ user: user._id })
       .sort({ createdAt: -1 });
 
-    res.json({
-      user,
-      transactions,
-    });
+    res.json({ user, transactions });
 
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
 
-// ==========================================
 // GET DEPOSIT REQUESTS
-// ==========================================
 exports.getDepositRequests = async (req, res) => {
   try {
     const requests = await DepositRequest.find({ status: "pending" });
     res.json(requests);
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
 
-// ==========================================
 // APPROVE DEPOSIT
-// ==========================================
 exports.approveDeposit = async (req, res) => {
   try {
     const { id } = req.params;
 
     const request = await DepositRequest.findById(id);
-    if (!request) {
-      return res.status(404).json({ message: "Request not found" });
-    }
-
-    if (request.status !== "pending") {
-      return res.status(400).json({ message: "Already processed" });
+    if (!request || request.status !== "pending") {
+      return res.status(400).json({ message: "Invalid request" });
     }
 
     const user = await User.findById(request.user);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
 
     user.balance += request.amount;
     await user.save();
@@ -99,26 +76,19 @@ exports.approveDeposit = async (req, res) => {
     res.json({ message: "Deposit approved" });
 
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
 
 
-// ==========================================
 // DECLINE DEPOSIT
-// ==========================================
 exports.declineDeposit = async (req, res) => {
   try {
     const { id } = req.params;
 
     const request = await DepositRequest.findById(id);
-    if (!request) {
-      return res.status(404).json({ message: "Request not found" });
-    }
-
-    if (request.status !== "pending") {
-      return res.status(400).json({ message: "Already processed" });
+    if (!request || request.status !== "pending") {
+      return res.status(400).json({ message: "Invalid request" });
     }
 
     const user = await User.findById(request.user);
@@ -127,7 +97,7 @@ exports.declineDeposit = async (req, res) => {
       user: request.user,
       type: "dep_cancel",
       amount: 0,
-      balanceAfter: user ? user.balance : 0,
+      balanceAfter: user.balance,
     });
 
     request.status = "declined";
@@ -136,7 +106,6 @@ exports.declineDeposit = async (req, res) => {
     res.json({ message: "Deposit declined" });
 
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };
