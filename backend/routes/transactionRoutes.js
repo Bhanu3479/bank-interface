@@ -1,18 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
+const transactionController = require("../controllers/transactionController");
 
-const protect = require("../middleware/authMiddleware");
-
-const {
-  getTransactions,
-} = require("../controllers/transactionController");
-
-
-// ================================
-// TRANSACTION ROUTES (Mini Statement)
-// ================================
-
-// Get transaction history
-router.get("/", protect, getTransactions);
+router.get("/", authMiddleware, transactionController.getTransactions);
 
 module.exports = router;
