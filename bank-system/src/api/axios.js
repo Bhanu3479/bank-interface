@@ -1,10 +1,9 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: "https://bank-backend-7uqn.onrender.com",
 });
 
-// Attach token automatically
 API.interceptors.request.use((config) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const managerToken = localStorage.getItem("managerToken");
