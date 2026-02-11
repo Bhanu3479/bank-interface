@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const Transaction = require("../models/Transaction");
+const DepositRequest = require("../models/DepositRequest");
 
 
 // ==========================================
@@ -27,7 +28,7 @@ exports.getBalance = async (req, res) => {
 
 
 // ==========================================
-// DEPOSIT
+// DEPOSIT (REQUEST BASED)
 // ==========================================
 exports.deposit = async (req, res) => {
   try {
@@ -39,26 +40,28 @@ exports.deposit = async (req, res) => {
 
     const user = await User.findById(req.user);
 
-    user.balance += Number(amount);
-    await user.save();
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    await Transaction.create({
+    // Create deposit request instead of direct credit
+    await DepositRequest.create({
       user: user._id,
-      type: "deposit",
+      accountNumber: user.accountNumber,
+      name: user.name,
       amount: Number(amount),
-      receiver: null,
     });
 
     res.json({
-      message: "Deposit successful",
-      newBalance: user.balance,
+      message: "Deposit request sent to manager for approval",
     });
 
   } catch (error) {
-    console.error("DEPOSIT ERROR:", error);
+    console.error("DEPOSIT REQUEST ERROR:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 // ==========================================
