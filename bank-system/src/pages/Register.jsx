@@ -1,55 +1,83 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
+import Navbar from "../components/Navbar";
 
 function Register() {
-  const [form, setForm] = useState({
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    mobile: "",
   });
 
-  const navigate = useNavigate();
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleRegister = async () => {
     try {
-      const res = await API.post("/auth/register", form);
-      alert("Account Created! Your Account No: " + res.data.accountNumber);
+      const res = await API.post("/auth/register", formData);
+
+      alert("Account created successfully");
       navigate("/");
+
     } catch (error) {
-      alert("Registration failed");
+      alert(error.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <div className="center">
-      <div className="card">
-        <h2>Create Account - Bhanu Bank</h2>
+    <>
+      <Navbar />
 
-        <input
-          placeholder="Full Name"
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
+      <div className="operation-container">
+        <div className="operation-card">
+          <h2>Create New Account</h2>
 
-        <input
-          placeholder="Email"
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-        />
-        <input
-          placeholder="Phone Number"
-          value={mobile}
-          onChange={(e) => setMobile(e.target.value)}
+          <input
+            type="text"
+            name="name"
+            placeholder="Full Name"
+            value={formData.name}
+            onChange={handleChange}
           />
 
-        <input
-          type="password"
-          placeholder="Password"
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-        />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+          />
 
-        <button onClick={handleRegister}>Register</button>
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+
+          <input
+            type="text"
+            name="mobile"
+            placeholder="Mobile Number"
+            value={formData.mobile}
+            onChange={handleChange}
+          />
+
+          <button onClick={handleRegister}>
+            Register
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
