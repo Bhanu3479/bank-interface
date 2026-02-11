@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
+import Navbar from "../components/Navbar";
 
 function ManagerPanel() {
   const [section, setSection] = useState("dashboard");
@@ -16,17 +17,15 @@ function ManagerPanel() {
     navigate("/manager-login");
   };
 
-  // Load All Accounts
   const loadAccounts = async () => {
     try {
       const res = await API.get("/manager/accounts");
       setAccounts(res.data);
     } catch (error) {
-      console.error("Error loading accounts:", error);
+      console.error(error);
     }
   };
 
-  // Load Specific Account
   const loadAccountDetails = async () => {
     try {
       const res = await API.get(`/manager/account/${searchAcc}`);
@@ -43,129 +42,137 @@ function ManagerPanel() {
   }, [section]);
 
   return (
-    <div style={{ padding: "40px" }}>
+    <>
+      <Navbar />
 
-      {/* Header with Logout */}
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "30px"
-      }}>
-        <h2>Manager Panel</h2>
+      <div className="operation-container">
+        <div className="operation-card" style={{ width: "900px" }}>
 
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "8px 14px",
-            backgroundColor: "#ef4444",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "bold"
-          }}
-        >
-          Logout
-        </button>
-      </div>
+          {/* Header */}
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px"
+          }}>
+            <h2>Manager Dashboard 👔</h2>
+            <button
+              onClick={handleLogout}
+              style={{
+                backgroundColor: "#ef4444",
+                padding: "8px 14px",
+                borderRadius: "6px",
+                border: "none",
+                color: "white",
+                fontWeight: "bold",
+                cursor: "pointer"
+              }}
+            >
+              Logout
+            </button>
+          </div>
 
-      {/* Navigation Buttons */}
-      <div style={{ marginBottom: "20px" }}>
-        <button onClick={() => setSection("dashboard")}>Dashboard</button>
-        <button onClick={() => setSection("accounts")}>See Accounts</button>
-        <button onClick={() => setSection("manage")}>Manage Account</button>
-        <button onClick={() => setSection("requests")}>Requests</button>
-      </div>
+          {/* Navigation Buttons */}
+          <div style={{ marginBottom: "25px" }}>
+            <button onClick={() => setSection("dashboard")}>Dashboard</button>
+            <button onClick={() => setSection("accounts")} style={{ marginLeft: "10px" }}>See Accounts</button>
+            <button onClick={() => setSection("manage")} style={{ marginLeft: "10px" }}>Manage Account</button>
+            <button onClick={() => setSection("requests")} style={{ marginLeft: "10px" }}>Requests</button>
+          </div>
 
-      {/* Dashboard */}
-      {section === "dashboard" && (
-        <div>
-          <h3>Welcome, Bank Manager 👔</h3>
-        </div>
-      )}
+          {/* Dashboard */}
+          {section === "dashboard" && (
+            <div>
+              <h3>Welcome, Manager</h3>
+              <p>Use the options above to manage accounts.</p>
+            </div>
+          )}
 
-      {/* See Accounts */}
-      {section === "accounts" && (
-        <div>
-          <h3>All Accounts</h3>
+          {/* See Accounts */}
+          {section === "accounts" && (
+            <div>
+              <h3>All Accounts</h3>
 
-          <table border="1" cellPadding="10" width="100%">
-            <thead>
-              <tr>
-                <th>Account Number</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Mobile</th>
-              </tr>
-            </thead>
-            <tbody>
-              {accounts.map((acc) => (
-                <tr key={acc._id}>
-                  <td>{acc.accountNumber}</td>
-                  <td>{acc.name}</td>
-                  <td>{acc.email}</td>
-                  <td>{acc.mobile || "0"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Manage Account */}
-      {section === "manage" && (
-        <div>
-          <h3>Manage Account</h3>
-
-          <input
-            placeholder="Enter Account Number"
-            value={searchAcc}
-            onChange={(e) => setSearchAcc(e.target.value)}
-          />
-
-          <button onClick={loadAccountDetails}>Search</button>
-
-          {accountDetails && (
-            <div style={{ marginTop: "20px" }}>
-              <h4>User Details</h4>
-              <p>Name: {accountDetails.user.name}</p>
-              <p>Email: {accountDetails.user.email}</p>
-              <p>Balance: ₹ {accountDetails.user.balance}</p>
-
-              <h4>Transactions</h4>
-              <table border="1" cellPadding="8" width="100%">
+              <table className="styled-table">
                 <thead>
                   <tr>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Date</th>
+                    <th>Account Number</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {accountDetails.transactions.map((txn) => (
-                    <tr key={txn._id}>
-                      <td>{txn.type}</td>
-                      <td>{txn.amount}</td>
-                      <td>{new Date(txn.createdAt).toLocaleString()}</td>
+                  {accounts.map((acc) => (
+                    <tr key={acc._id}>
+                      <td>{acc.accountNumber}</td>
+                      <td>{acc.name}</td>
+                      <td>{acc.email}</td>
+                      <td>{acc.mobile || "0"}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
-        </div>
-      )}
 
-      {/* Requests */}
-      {section === "requests" && (
-        <div>
-          <h3>Requests Section</h3>
-          <p>Coming Soon...</p>
-        </div>
-      )}
+          {/* Manage Account */}
+          {section === "manage" && (
+            <div>
+              <h3>Manage Account</h3>
 
-    </div>
+              <input
+                placeholder="Enter Account Number"
+                value={searchAcc}
+                onChange={(e) => setSearchAcc(e.target.value)}
+              />
+              <button onClick={loadAccountDetails} style={{ marginLeft: "10px" }}>
+                Search
+              </button>
+
+              {accountDetails && (
+                <div style={{ marginTop: "20px" }}>
+                  <h4>User Details</h4>
+                  <p>Name: {accountDetails.user.name}</p>
+                  <p>Email: {accountDetails.user.email}</p>
+                  <p>Balance: ₹ {accountDetails.user.balance}</p>
+
+                  <h4 style={{ marginTop: "15px" }}>Transactions</h4>
+
+                  <table className="styled-table">
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {accountDetails.transactions.map((txn) => (
+                        <tr key={txn._id}>
+                          <td>{txn.type}</td>
+                          <td>{txn.amount}</td>
+                          <td>{new Date(txn.createdAt).toLocaleString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Requests */}
+          {section === "requests" && (
+            <div>
+              <h3>Requests Section</h3>
+              <p>Coming soon...</p>
+            </div>
+          )}
+
+        </div>
+      </div>
+    </>
   );
 }
 
