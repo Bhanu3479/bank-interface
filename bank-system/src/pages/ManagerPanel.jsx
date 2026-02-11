@@ -8,6 +8,7 @@ function ManagerPanel() {
   const [accounts, setAccounts] = useState([]);
   const [searchAcc, setSearchAcc] = useState("");
   const [accountDetails, setAccountDetails] = useState(null);
+  const [requests, setRequests] = useState([]);
 
   const navigate = useNavigate();
 
@@ -17,6 +18,9 @@ function ManagerPanel() {
     navigate("/manager-login");
   };
 
+  // ================================
+  // Load All Accounts
+  // ================================
   const loadAccounts = async () => {
     try {
       const res = await API.get("/manager/accounts");
@@ -26,6 +30,9 @@ function ManagerPanel() {
     }
   };
 
+  // ================================
+  // Load Account Details
+  // ================================
   const loadAccountDetails = async () => {
     try {
       const res = await API.get(`/manager/account/${searchAcc}`);
@@ -35,10 +42,37 @@ function ManagerPanel() {
     }
   };
 
-  useEffect(() => {
-    if (section === "accounts") {
-      loadAccounts();
+  // ================================
+  // Load Deposit Requests
+  // ================================
+  const loadRequests = async () => {
+    try {
+      const res = await API.get("/manager/requests");
+      setRequests(res.data);
+    } catch (error) {
+      console.error(error);
     }
+  };
+
+  // ================================
+  // Approve Deposit
+  // ================================
+  const approveRequest = async (id) => {
+    await API.post(`/manager/approve/${id}`);
+    loadRequests();
+  };
+
+  // ================================
+  // Decline Deposit
+  // ================================
+  const declineRequest = async (id) => {
+    await API.post(`/manager/decline/${id}`);
+    loadRequests();
+  };
+
+  useEffect(() => {
+    if (section === "accounts") loadAccounts();
+    if (section === "requests") loadRequests();
   }, [section]);
 
   return (
@@ -46,7 +80,7 @@ function ManagerPanel() {
       <Navbar />
 
       <div className="operation-container">
-        <div className="operation-card" style={{ width: "900px" }}>
+        <div className="operation-card" style={{ width: "950px" }}>
 
           {/* Header */}
           <div style={{
@@ -72,7 +106,7 @@ function ManagerPanel() {
             </button>
           </div>
 
-          {/* Navigation Buttons */}
+          {/* Navigation */}
           <div style={{ marginBottom: "25px" }}>
             <button onClick={() => setSection("dashboard")}>Dashboard</button>
             <button onClick={() => setSection("accounts")} style={{ marginLeft: "10px" }}>See Accounts</button>
@@ -80,15 +114,15 @@ function ManagerPanel() {
             <button onClick={() => setSection("requests")} style={{ marginLeft: "10px" }}>Requests</button>
           </div>
 
-          {/* Dashboard */}
+          {/* ================= Dashboard ================= */}
           {section === "dashboard" && (
             <div>
               <h3>Welcome, Manager</h3>
-              <p>Use the options above to manage accounts.</p>
+              <p>Approve deposits and manage accounts securely.</p>
             </div>
           )}
 
-          {/* See Accounts */}
+          {/* ================= See Accounts ================= */}
           {section === "accounts" && (
             <div>
               <h3>All Accounts</h3>
@@ -116,7 +150,7 @@ function ManagerPanel() {
             </div>
           )}
 
-          {/* Manage Account */}
+          {/* ================= Manage Account ================= */}
           {section === "manage" && (
             <div>
               <h3>Manage Account</h3>
@@ -162,11 +196,47 @@ function ManagerPanel() {
             </div>
           )}
 
-          {/* Requests */}
+          {/* ================= Requests ================= */}
           {section === "requests" && (
             <div>
-              <h3>Requests Section</h3>
-              <p>Coming soon...</p>
+              <h3>Deposit Requests</h3>
+
+              <table className="styled-table">
+                <thead>
+                  <tr>
+                    <th>Account No</th>
+                    <th>Account Holder</th>
+                    <th>Amount</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {requests.map((req) => (
+                    <tr key={req._id}>
+                      <td>{req.accountNumber}</td>
+                      <td>{req.name}</td>
+                      <td>₹ {req.amount}</td>
+                      <td>
+                        <button onClick={() => approveRequest(req._id)}>
+                          Issue
+                        </button>
+                        <button
+                          style={{
+                            marginLeft: "8px",
+                            backgroundColor: "#ef4444",
+                            color: "white"
+                          }}
+                          onClick={() => declineRequest(req._id)}
+                        >
+                          Decline
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {requests.length === 0 && <p>No pending requests</p>}
             </div>
           )}
 
