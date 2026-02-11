@@ -8,7 +8,20 @@ function Deposit() {
   const handleDeposit = async () => {
     try {
       await API.post("/account/deposit", { amount });
-      alert("Deposit successful");
+      const handleDeposit = async () => {
+      try {
+        const res = await API.post("/account/deposit", {
+        amount,
+      });
+
+    alert(res.data.message);  // <- shows correct backend message
+    setAmount("");
+
+  } catch (error) {
+    alert(error.response?.data?.message || "Deposit failed");
+  }
+};
+
       setAmount("");
     } catch (error) {
       alert(error.response?.data?.message || "Deposit failed");
