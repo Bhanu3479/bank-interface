@@ -1,10 +1,55 @@
 const DepositRequest = require("../models/DepositRequest");
 const Transaction = require("../models/Transaction");
-const User = require("../models/user"); // <-- Ensure correct casing
+const User = require("../models/user");
 
 
 // ==========================================
-// GET ALL PENDING REQUESTS
+// GET ALL ACCOUNTS
+// ==========================================
+exports.getAllAccounts = async (req, res) => {
+  try {
+    const users = await User.find().select(
+      "accountNumber name email mobile balance"
+    );
+
+    res.json(users);
+  } catch (error) {
+    console.error("GET ALL ACCOUNTS ERROR:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// ==========================================
+// GET SPECIFIC ACCOUNT DETAILS + TRANSACTIONS
+// ==========================================
+exports.getAccountDetails = async (req, res) => {
+  try {
+    const { accountNumber } = req.params;
+
+    const user = await User.findOne({ accountNumber });
+
+    if (!user) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    const transactions = await Transaction.find({ user: user._id })
+      .sort({ createdAt: -1 });
+
+    res.json({
+      user,
+      transactions,
+    });
+
+  } catch (error) {
+    console.error("GET ACCOUNT DETAILS ERROR:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+// ==========================================
+// GET ALL PENDING DEPOSIT REQUESTS
 // ==========================================
 exports.getDepositRequests = async (req, res) => {
   try {
@@ -80,7 +125,6 @@ exports.declineDeposit = async (req, res) => {
 
     const user = await User.findById(request.user);
 
-    // Create cancel transaction
     await Transaction.create({
       user: request.user,
       type: "dep_cancel",
