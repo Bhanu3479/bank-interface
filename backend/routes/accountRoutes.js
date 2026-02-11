@@ -14,17 +14,7 @@ const {
 // ================================
 // ACCOUNT ROUTES (Protected)
 // ================================
-
-// Get balance
-router.get("/balance", protect, getBalance);
-
-// Deposit money
-router.post("/deposit", protect, deposit);
-
-// Withdraw money
-router.post("/withdraw", protect, withdraw);
-
-// Transfer money
-router.post("/transfer", protect, transfer);
-
-module.exports = router;
+router.post("/deposit", authMiddleware, accountController.deposit);
+router.post("/withdraw", authMiddleware, accountController.withdraw);
+router.post("/transfer", authMiddleware, accountController.transfer);
+router.get("/balance", authMiddleware, accountController.getBalance);
