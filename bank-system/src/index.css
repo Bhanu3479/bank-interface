@@ -119,3 +119,23 @@ tr:nth-child(even) {
 .operation-card button:hover {
   background-color: #2563eb;
 }
+
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.styled-table th {
+  background-color: #1e3a8a;
+  color: white;
+  padding: 10px;
+}
+
+.styled-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
