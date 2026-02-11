@@ -3,7 +3,11 @@ const router = express.Router();
 const {
   getAllAccounts,
   getAccountDetails,
+  getDepositRequests,
+  approveDeposit,
+  declineDeposit,
 } = require("../controllers/managerController");
+
 
 // GET all accounts
 router.get("/accounts", getAllAccounts);
