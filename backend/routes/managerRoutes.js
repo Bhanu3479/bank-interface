@@ -1,43 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  getAllAccounts,
-  getAccountDetails,
-  getDepositRequests,
-  approveDeposit,
-  declineDeposit,
-} = require("../controllers/managerController");
+const managerController = require("../controllers/managerController");
 
-
-// ==========================================
-// GET ALL ACCOUNTS
-// ==========================================
-router.get("/accounts", getAllAccounts);
-
-
-// ==========================================
-// GET SPECIFIC ACCOUNT DETAILS
-// ==========================================
-router.get("/account/:accountNumber", getAccountDetails);
-
-
-// ==========================================
-// GET ALL DEPOSIT REQUESTS
-// ==========================================
-router.get("/requests", getDepositRequests);
-
-
-// ==========================================
-// APPROVE DEPOSIT REQUEST
-// ==========================================
-router.post("/approve/:id", approveDeposit);
-
-
-// ==========================================
-// DECLINE DEPOSIT REQUEST
-// ==========================================
-router.post("/decline/:id", declineDeposit);
-
+router.get("/accounts", managerController.getAllAccounts);
+router.get("/account/:accountNumber", managerController.getAccountDetails);
+router.get("/requests", managerController.getDepositRequests);
+router.post("/approve/:id", managerController.approveDeposit);
+router.post("/decline/:id", managerController.declineDeposit);
 
 module.exports = router;
