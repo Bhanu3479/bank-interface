@@ -21,16 +21,20 @@ function Register() {
   };
 
   const handleRegister = async () => {
-    try {
-      const res = await API.post("/auth/register", formData);
+  try {
+    const res = await API.post("/auth/register", formData);
 
-      alert("Account created successfully");
-      navigate("/");
+    alert(
+      `Account Created Successfully!\nYour Account Number: ${res.data.accountNumber}`
+    );
 
-    } catch (error) {
-      alert(error.response?.data?.message || "Registration failed");
-    }
-  };
+    navigate("/");
+
+  } catch (error) {
+    alert(error.response?.data?.message || "Registration failed");
+  }
+};
+
 
   return (
     <>
