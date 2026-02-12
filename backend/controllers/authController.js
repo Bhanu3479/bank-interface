@@ -12,7 +12,9 @@ const generateAccountNumber = async () => {
   let newNumber = 1;
 
   if (lastUser && lastUser.accountNumber) {
-    const lastNumber = parseInt(lastUser.accountNumber.replace("ACC", ""));
+    const lastNumber = parseInt(
+      lastUser.accountNumber.replace("ACC", "")
+    );
     newNumber = lastNumber + 1;
   }
 
@@ -20,33 +22,38 @@ const generateAccountNumber = async () => {
 };
 
 
-
 // ==========================================
-// REGISTER (Create New Account)
+// REGISTER
 // ==========================================
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, mobile } = req.body;
 
-    // Basic validation
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+    // Validation
+    if (!name || !email || !password || !mobile) {
+      return res.status(400).json({
+        message: "All fields including mobile are required",
+      });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({ message: "Password must be at least 6 characters" });
+      return res.status(400).json({
+        message: "Password must be at least 6 characters",
+      });
     }
 
-    // Check if email already exists
+    // Check existing email
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already registered" });
+      return res.status(400).json({
+        message: "Email already registered",
+      });
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Generate unique account number
+    // Generate account number
     const accountNumber = await generateAccountNumber();
 
     // Create user
@@ -54,6 +61,7 @@ exports.register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      mobile: Number(mobile),
       accountNumber,
       balance: 0,
     });
@@ -65,10 +73,11 @@ exports.register = async (req, res) => {
 
   } catch (error) {
     console.error("REGISTER ERROR:", error);
-    res.status(500).json({ message: "Server error during registration" });
+    res.status(500).json({
+      message: "Server error during registration",
+    });
   }
 };
-
 
 
 // ==========================================
@@ -79,19 +88,28 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "All fields are required" });
+      return res.status(400).json({
+        message: "All fields are required",
+      });
     }
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({
+        message: "Invalid email or password",
+      });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(
+      password,
+      user.password
+    );
 
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(400).json({
+        message: "Invalid email or password",
+      });
     }
 
     const token = jwt.sign(
@@ -106,6 +124,7 @@ exports.login = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        mobile: user.mobile,
         accountNumber: user.accountNumber,
         balance: user.balance,
       },
@@ -113,6 +132,8 @@ exports.login = async (req, res) => {
 
   } catch (error) {
     console.error("LOGIN ERROR:", error);
-    res.status(500).json({ message: "Server error during login" });
+    res.status(500).json({
+      message: "Server error during login",
+    });
   }
 };
